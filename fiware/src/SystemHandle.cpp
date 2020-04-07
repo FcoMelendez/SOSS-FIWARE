@@ -95,7 +95,15 @@ bool SystemHandle::configure(
             return false;
         }
     }
-
+    if (configuration["entity_id"])
+    {
+        std::string entity_id = configuration["entity_id"].as<std::string>();
+        std::cout << "[soss-fiware]: entity_id param is: " << entity_id << std::endl;
+    }
+    else
+    {
+        std::cout << "[soss-fiware]: No 'entity_id' has been loaded" << std::endl;
+    }
     fiware_connector_ = std::make_unique<NGSIV2Connector>(host, port, subscription_host, subscription_port);
 
     std::cout << "[soss-fiware]: configured!" << std::endl;
