@@ -35,13 +35,19 @@ NGSIV2Connector::NGSIV2Connector(
         const std::string& remote_host,
         uint16_t remote_port,
         const std::string& listener_host,
-        uint16_t listener_port)
+        uint16_t listener_port,
+        const std::string& ngsi_entity_id,
+        const std::string& ngsi_entity_type,
+        const std::string& ngsi_entity_attribute)
 
     : host_{remote_host}
     , port_{remote_port}
     , listener_host_{listener_host}
     , listener_port_{listener_port}
     , listener_{listener_port, std::bind(&NGSIV2Connector::receive, this, _1)}
+    , ngsi_entity_id_{ngsi_entity_id}
+    , ngsi_entity_type_{ngsi_entity_type}
+    , ngsi_entity_attribute_{ngsi_entity_attribute}
     , subscription_callbacks_{}
 {
 }
@@ -132,6 +138,7 @@ bool NGSIV2Connector::unregister_subscription(
 bool NGSIV2Connector::update_entity(
         const std::string& ngsi_entity_id,
         const std::string& ngsi_entity_type,
+        const std::string& ngsi_entity_attribute,
         const std::string& ros_topic_name,
         const std::string& ros_message_type,
         const Json& ros_message_content_in_json_format)
@@ -167,10 +174,34 @@ bool NGSIV2Connector::update_entity(
     //          }
     //      }
     //  }
-    std::string urn = "entities/" + ros_topic_name + "/attrs?type=" + ros_message_type;
-    std::string response = request("PUT", false, urn, ros_message_content_in_json_format);
+
+    // [FIWARE] Original 'urn' and 'response' objects
+    /*
+     * std::string urn = "entities/" + ros_topic_name + "/attrs?type=" + ros_message_type;
+     * std::string response = request("PUT", false, urn, ros_message_content_in_json_format);
+    */
+    // End of Original 'urn' and 'response' objects
+
     // [FIWARE] NGSI Entity Id and Type Management
-    std::cout<< "Entity Id: " << ngsi_entity_id << " Type: " << ngsi_entity_type;
+    std::cout<< "Entity Id: " << ngsi_entity_id << " Type: " << ngsi_entity_type << std::endl;
+    std::cout<< "The attribute to be updated is: " << ngsi_entity_attribute << std::endl;
+    std::cout<< "The ROS topic associated with this update is: " << ros_topic_name <<" ("<< ros_message_type<<")" <<std::endl;
+
+
+    //std::string urn = "entities/" + ngsi_entity_id + "/attrs?type=" + ngsi_entity_type;
+    std::string urn = "entities/" + ngsi_entity_id + "/attrs";
+
+    //const Json ngsi_json_message;
+    //ngsi_json_message[]
+    Json ngsi_json_message;
+    ngsi_json_message[ngsi_entity_attribute]["value"]["type"] = "RosMessage";
+    ngsi_json_message[ngsi_entity_attribute]["value"]["test_field"] = "/move_base/goal";
+    ngsi_json_message[ngsi_entity_attribute]["value"]["RosMessageType"] = ros_message_type;
+    ngsi_json_message[ngsi_entity_attribute]["value"]["RosTopicName"] = ros_topic_name;
+    ngsi_json_message[ngsi_entity_attribute]["value"]["data"] = ros_message_content_in_json_format.at("data");
+
+    std::string response = request("PUT", false, urn, ngsi_json_message);
+
     // End of NGSI Entity Id and Type Management
 
     if (!response.empty())

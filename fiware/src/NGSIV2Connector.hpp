@@ -41,7 +41,10 @@ public:
             const std::string& remote_host,
             uint16_t remote_port,
             const std::string& listener_host,
-            uint16_t listener_port);
+            uint16_t listener_port,
+            const std::string& ngsi_entity_id,
+            const std::string& ngsi_entity_type,
+            const std::string& ngsi_entity_attribute);
 
     virtual ~NGSIV2Connector() = default;
 
@@ -56,6 +59,7 @@ public:
     bool update_entity(
             const std::string& ngsi_entity_id,
             const std::string& ngsi_entity_type,
+            const std::string& ngsi_entity_attribute,
             const std::string& ros_topic_name,
             const std::string& ros_message_type,
             const Json& ros_message_content_in_json_format);
@@ -82,6 +86,9 @@ private:
     std::string listener_host_;
     uint16_t listener_port_;
     Listener listener_;
+    std::string ngsi_entity_id_;
+    std::string ngsi_entity_type_;
+    std::string ngsi_entity_attribute_;
 
     std::map<std::string, FiwareSubscriptionCallback> subscription_callbacks_;
     std::mutex subscription_mutex_;
