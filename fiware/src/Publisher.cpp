@@ -44,10 +44,11 @@ bool Publisher::publish(
 
     Json fiware_message = Conversion::soss_to_fiware(soss_message);
     // [FIWARE] hardcoded Entity Id and type
-    const std::string entity_id("MyRobot");
+    const std::string entity_id("my_robot");
     const std::string entity_type("AMR");
+     const std::string entity_attribute("ros2_heartbeat");
     // End of hardcoded Entity Id and Type
-    return fiware_connector_->update_entity(entity_id, entity_type, topic_name_, message_type_, fiware_message);
+    return fiware_connector_->update_entity(entity_id, entity_type, entity_attribute, topic_name_, message_type_, fiware_message);
 }
 
 
