@@ -54,9 +54,11 @@ public:
             const std::string& subscription_id);
 
     bool update_entity(
-            const std::string& entity,
-            const std::string& type,
-            const Json& json_message);
+            const std::string& ngsi_entity_id,
+            const std::string& ngsi_entity_type,
+            const std::string& ros_topic_name,
+            const std::string& ros_message_type,
+            const Json& ros_message_content_in_json_format);
 
     const std::string& get_host() const { return host_; }
     uint16_t get_port() const { return port_; }

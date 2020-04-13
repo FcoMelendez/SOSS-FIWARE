@@ -130,12 +130,48 @@ bool NGSIV2Connector::unregister_subscription(
 }
 
 bool NGSIV2Connector::update_entity(
-        const std::string& entity,
-        const std::string& type,
-        const Json& json_message)
+        const std::string& ngsi_entity_id,
+        const std::string& ngsi_entity_type,
+        const std::string& ros_topic_name,
+        const std::string& ros_message_type,
+        const Json& ros_message_content_in_json_format)
 {
-    std::string urn = "entities/" + entity + "/attrs?type=" + type;
-    std::string response = request("PUT", false, urn, json_message);
+    // [FIWARE] mapping
+    // For the time being,
+    //   the topic_name is being used as 'entity'
+    //   the message_type is being used as 'type'
+    //   the fiware_message is translated into JSON and sent as "json_message"
+    // A first approach consists of changing this to,
+    //   - the conf param 'entity_id' being used as 'entity'
+    //   - the conf param 'entity_type' being used as 'type'
+    //   - A mapping between a list of 'NGSI Attribute names' and 'ROS topic names'should be provided also
+    //     as part of the configuration file
+    //   - The structure of NGSI attributes that encapsulate ROS messages should consist of:
+    //      * "type" : "Ros2Message"
+    //      * "value":
+    //          · "type": message_type
+    //          · "topic_name": ros_topic_name
+    //          · "value": json_message
+    //
+    // Example:
+    //   {
+    //      "id": entity_id,
+    //      "type": entity_type,
+    //      "attribute_name": {
+    //          "type": "Ros2Message",
+    //          "value": {
+    //              "type": message_type,
+    //              "topic_name": topic_name,
+    //              "json_data": json_message
+    //              }
+    //          }
+    //      }
+    //  }
+    std::string urn = "entities/" + ros_topic_name + "/attrs?type=" + ros_message_type;
+    std::string response = request("PUT", false, urn, ros_message_content_in_json_format);
+    // [FIWARE] NGSI Entity Id and Type Management
+    std::cout<< "Entity Id: " << ngsi_entity_id << " Type: " << ngsi_entity_type;
+    // End of NGSI Entity Id and Type Management
 
     if (!response.empty())
     {
