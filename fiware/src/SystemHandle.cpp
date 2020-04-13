@@ -95,16 +95,43 @@ bool SystemHandle::configure(
             return false;
         }
     }
+
+    // [FIWARE] NGSI Entity details
+    // ----------------------------
+    // 'entity_id' this is the 'id' of the NGSI entity that represents the ROS-based robotic system in ORION
+    // 'entity_type' this is the 'type' of the NGSI entity that represents the ROS-based robotic system in ORION
+    std::string entity_id = "unset";
+    std::string entity_type = "unset";
+    std::string rosTopic2NgsiAttribute = "unset";
     if (configuration["entity_id"])
     {
-        std::string entity_id = configuration["entity_id"].as<std::string>();
-        std::cout << "[soss-fiware]: entity_id param is: " << entity_id << std::endl;
+        entity_id = configuration["entity_id"].as<std::string>();
+        std::cout << "[soss-fiware]: the 'entity_id' is: " << entity_id << std::endl;
     }
     else
     {
         std::cout << "[soss-fiware]: No 'entity_id' has been loaded" << std::endl;
     }
-    fiware_connector_ = std::make_unique<NGSIV2Connector>(host, port, subscription_host, subscription_port);
+    if (configuration["entity_type"])
+    {
+        entity_type = configuration["entity_type"].as<std::string>();
+        std::cout << "[soss-fiware]: the 'entity_type' is: " << entity_type << std::endl;
+    }
+    else
+    {
+        std::cout << "[soss-fiware]: No 'entity_type' has been loaded" << std::endl;
+    }
+    if (configuration["ros2_heartbeat"])
+    {
+        rosTopic2NgsiAttribute = configuration["ros2_heartbeat"].as<std::string>();
+        std::cout << "[soss-fiware]: the topic "<< rosTopic2NgsiAttribute << " maps to the 'ros2_heartbeat' attribute in NGSI" << std::endl;
+    }
+    else
+    {
+        std::cout << "[soss-fiware]: No 'entity_type' has been loaded" << std::endl;
+    }// End of [FIWARE] NGSI Entity details
+    fiware_connector_ = std::make_unique<NGSIV2Connector>(host, port, subscription_host, subscription_port,
+                                                          entity_id, entity_type, rosTopic2NgsiAttribute);
 
     std::cout << "[soss-fiware]: configured!" << std::endl;
     return true;
@@ -118,7 +145,7 @@ bool SystemHandle::okay() const
 bool SystemHandle::spin_once()
 {
     using namespace std::chrono_literals;
-    std::this_thread::sleep_for(100ms);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     return okay();
 }
 
