@@ -2,6 +2,7 @@ import urllib.request
 from tkinter import *
 import json
 
+# Common Variables
 url_entry_textbox_width = 75
 
 class MyFirstGUI(Tk):
