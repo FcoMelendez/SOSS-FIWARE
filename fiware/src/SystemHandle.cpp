@@ -122,23 +122,21 @@ bool SystemHandle::configure(
     {
         std::cout << "[soss-fiware]: No 'entity_type' has been loaded" << std::endl;
     }
-    if (configuration["ros2_heartbeat"])
-    {
-        rosTopic2NgsiAttribute = configuration["ros2_heartbeat"].as<std::string>();
-        std::cout << "[soss-fiware]: the topic "<< rosTopic2NgsiAttribute << " maps to the 'ros2_heartbeat' attribute in NGSI" << std::endl;
-    }
-    else
-    {
-        std::cout << "[soss-fiware]: No 'entity_type' has been loaded" << std::endl;
-    }
     if (configuration["mapping"])
     {
         std::cout << "Mapping processing \n";
+        int n = 1;
         for ( const auto &rosTopic_ngsiAttribute_pair : configuration["mapping"] ) {
                 std::string rosTopic(rosTopic_ngsiAttribute_pair.first.as<std::string>());
                 std::string ngsiAttribute(rosTopic_ngsiAttribute_pair.second.as<std::string>());
                 std::cout << "ROS Topic '"<< rosTopic << "' maps to '" << ngsiAttribute << "' NGSI Attribute \n";
                 attribute2topic_json_map[rosTopic] = ngsiAttribute;
+                // For the time bieng, pick only the first topic of the mapping
+                if (n==1)
+                {
+                    rosTopic2NgsiAttribute = rosTopic;
+                    n++;
+                }
         }
     }
     else
