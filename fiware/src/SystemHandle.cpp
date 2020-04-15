@@ -103,6 +103,7 @@ bool SystemHandle::configure(
     std::string entity_id = "unset";
     std::string entity_type = "unset";
     std::string rosTopic2NgsiAttribute = "unset";
+    Json attribute2topic_json_map;
     if (configuration["entity_id"])
     {
         entity_id = configuration["entity_id"].as<std::string>();
@@ -129,10 +130,25 @@ bool SystemHandle::configure(
     else
     {
         std::cout << "[soss-fiware]: No 'entity_type' has been loaded" << std::endl;
-    }// End of [FIWARE] NGSI Entity details
+    }
+    if (configuration["mapping"])
+    {
+        std::cout << "Mapping processing \n";
+        for ( const auto &rosTopic_ngsiAttribute_pair : configuration["mapping"] ) {
+                std::string rosTopic(rosTopic_ngsiAttribute_pair.first.as<std::string>());
+                std::string ngsiAttribute(rosTopic_ngsiAttribute_pair.second.as<std::string>());
+                std::cout << "ROS Topic '"<< rosTopic << "' maps to '" << ngsiAttribute << "' NGSI Attribute \n";
+                attribute2topic_json_map[rosTopic] = ngsiAttribute;
+        }
+    }
+    else
+    {
+        std::cout << "[soss-fiware]: No 'mapping' has been loaded" << std::endl;
+    }
+    // End of [FIWARE] NGSI Entity details
     fiware_connector_ = std::make_unique<NGSIV2Connector>(host, port, subscription_host, subscription_port,
                                                           entity_id, entity_type, rosTopic2NgsiAttribute);
-
+    std::cout << "REmove this line" << subscription_port << std::endl;
     std::cout << "[soss-fiware]: configured!" << std::endl;
     return true;
 }

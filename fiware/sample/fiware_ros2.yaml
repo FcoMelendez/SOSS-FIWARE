@@ -1,10 +1,15 @@
 systems:
     ros2: { type: ros2 }
-    fiware: { type: fiware, host: "172.17.0.1", 
-	      port: 1026, 
-              entity_id: "my_robot", 
+    fiware: { 
+              type: fiware, host: "172.17.0.1",
+              port: 1026,
+              entity_id: "my_robot",
               entity_type: "AMR",
-	      ros2_heartbeat: "hello_fiware"}
+              ros2_heartbeat: "hello_fiware",
+              mapping: {
+                hello : "hi",
+                fg : "fg" }
+            }
 
 routes:
     fiware_to_ros2: { from: fiware, to: ros2 }
